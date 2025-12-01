@@ -13,8 +13,7 @@ import string
 import plotly.graph_objects as go
 
 
-
-class ParserName:
+class Parsnip:
     """
     Extensible framework for natural langauge processing and text analysis.
     Supports custom parsers and multiple visualization types.
@@ -22,7 +21,9 @@ class ParserName:
 
     def __init__(self):
         """Constructor to initialize state"""
-        self.data = defaultdict(dict)  # Where all the data extracted from the loaded documents is stored
+        self.data = defaultdict(
+            dict
+        )  # Where all the data extracted from the loaded documents is stored
         self.stop_words = []
 
     def load_stop_words(self, filepath: str):
@@ -44,11 +45,12 @@ class ParserName:
         except ImportError:
             print("PyPDF2 not installed. Installing...")
             import subprocess
-            subprocess.check_call(['pip', 'install', 'PyPDF2'])
+
+            subprocess.check_call(["pip", "install", "PyPDF2"])
             import PyPDF2
 
         # Read PDF
-        with open(filename, 'rb') as file:
+        with open(filename, "rb") as file:
             pdf_reader = PyPDF2.PdfReader(file)
             text = ""
 
@@ -58,7 +60,7 @@ class ParserName:
 
         # Clean the text: lowercase and remove punctuation
         text = text.lower()
-        text = text.translate(str.maketrans('', '', string.punctuation))
+        text = text.translate(str.maketrans("", "", string.punctuation))
 
         # Split into words
         words = text.split()
@@ -80,12 +82,12 @@ class ParserName:
         """
         For processing plain text file (txt)
         """
-        with open(filename, 'r', encoding='utf-8') as file:
+        with open(filename, "r", encoding="utf-8") as file:
             text = file.read()
 
         # Clean the text: lowercase and remove punctuation
         text = text.lower()
-        text = text.translate(str.maketrans('', '', string.punctuation))
+        text = text.translate(str.maketrans("", "", string.punctuation))
 
         # Split into words
         words = text.split()
@@ -101,6 +103,7 @@ class ParserName:
 
         print(f"Parsed {filename}: {numwords} words")
         return results
+
     def load_text(self, filename, label=None, parser=None):
         """
         Register a text document with the framework.
@@ -131,16 +134,16 @@ class ParserName:
                     filtered[word] = count
             self.data["wordcount"][label] = filtered
 
-# Don't thing we need this
-#    def compare_num_words(self):
-#        """A very simplistic visualization that creates
-#        a bar chart comparing num words for each text file
-#        For HW7, I expect much more interesting visualizations"""
-#
-#        numwords = self.data["numwords"]
-#        for label, nw in numwords.items():
-#            plt.bar(label, nw)
-#       plt.show()
+    # Don't thing we need this
+    #    def compare_num_words(self):
+    #        """A very simplistic visualization that creates
+    #        a bar chart comparing num words for each text file
+    #        For HW7, I expect much more interesting visualizations"""
+    #
+    #        numwords = self.data["numwords"]
+    #        for label, nw in numwords.items():
+    #            plt.bar(label, nw)
+    #       plt.show()
 
     def wordcount_sankey(self, word_list=None, k=5):
         """
@@ -177,11 +180,12 @@ class ParserName:
                     values.append(count)
 
         # Create fig
-        fig = (go.Figure(go.Sankey(
-            node=dict(label=nodes),
-            link=dict(source=sources, target=targets, value=values),
-        )))
+        fig = go.Figure(
+            go.Sankey(
+                node=dict(label=nodes),
+                link=dict(source=sources, target=targets, value=values),
+            )
+        )
 
         fig.update_layout(title="Climate Change Reports: Word Frequency Flow Analysis")
         fig.show()
-

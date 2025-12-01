@@ -5,6 +5,7 @@ Visualization Module for NLP Tasks
 import numpy as np
 import matplotlib.pyplot as plt
 
+
 class NatLanGraphs:
 
     def __init__(self):
@@ -29,8 +30,7 @@ class NatLanGraphs:
         cols = int(np.ceil(np.sqrt(num_docs)))
         rows = int(np.ceil(num_docs / cols))
 
-        fig, axes = plt.subplots(rows, cols, figsize=(5*cols, 4*rows))
-
+        fig, axes = plt.subplots(rows, cols, figsize=(5 * cols, 4 * rows))
 
         # Make axes a list if there is only one subplot
         if num_docs == 1:
@@ -53,7 +53,9 @@ class NatLanGraphs:
         for index in range(num_docs, len(axes)):
             axes[index].set_visible(False)
 
-        plt.suptitle(f'Top {top_n} Most Frequent Words Across Climate Change Reports (1970s-2023)')
+        plt.suptitle(
+            f"Top {top_n} Most Frequent Words Across Climate Change Reports (1970s-2023)"
+        )
         plt.tight_layout()
         plt.show()
         plt.show()
@@ -82,18 +84,17 @@ class NatLanGraphs:
         # Plot bars for each doc
         for index, label in enumerate(labels):
             counts = [wordcounts[label].get(word, 0) for word in words]
-            offset = (index - len(labels)/2) * width + width / 2
+            offset = (index - len(labels) / 2) * width + width / 2
             ax.bar(x + offset, counts, width, label=label)
 
-        ax.set_xlabel('Words')
-        ax.set_ylabel('Frequency')
-        ax.set_title('Evolution of Climate Terminology: Word Frequency Comparison Across Decades')
+        ax.set_xlabel("Words")
+        ax.set_ylabel("Frequency")
+        ax.set_title(
+            "Evolution of Climate Terminology: Word Frequency Comparison Across Decades"
+        )
         ax.set_xticks(x)
-        ax.set_xticklabels(words, rotation=45, ha='right')
-        ax.legend(title='Report', bbox_to_anchor=(1.05, 1), loc='upper left')
-
+        ax.set_xticklabels(words, rotation=45, ha="right")
+        ax.legend(title="Report", bbox_to_anchor=(1.05, 1), loc="upper left")
 
         plt.tight_layout()
         plt.show()
-
-
