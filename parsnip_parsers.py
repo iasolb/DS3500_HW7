@@ -6,7 +6,6 @@ Members: Amir Sesay, Cassandra Cinzori, Ian Solberg, Iyman Mahmoud
 Domain-specific parsers for different file types
 """
 
-from nltk.sem.chat80 import items
 from collections import Counter
 import string
 
@@ -54,8 +53,8 @@ def pdf_parser(filename):
 
 def json_parser(filename):
     """
-    Custom parser for JSON files
-    Expects JSON with eitehr a 'text' or 'content' field containing the text to analyze
+    Custom parser for JSON files.
+    Expects JSON with 'text' or 'content' or 'body' fields containing text to analyze.
     """
     import json
 
@@ -63,26 +62,26 @@ def json_parser(filename):
     with open(filename, "r", encoding="utf-8") as file:
         data = json.load(file)
 
-    # Extract text - look for common field names
+    # Extract text
     if isinstance(data, dict):
-        text = data.get("text", data.get("content", data.get("body", '')))
+        text = data.get("text") or data.get("content") or data.get("body") or ""
     elif isinstance(data, list):
-        # If it is a list of objects, concatenate all text fields
-        text = ''.json([
-            items.get("text", items.get("content", items.get("body", '')))
-            for item in data if isinstance(item, dict)
-        ])
+        # If it's a list of dicts, concatenate their text fields
+        text_chunks = []
+        for item in data:
+            if isinstance(item, dict):
+                text_chunks.append(
+                    item.get("text") or item.get("content") or item.get("body") or ""
+                )
+        text = " ".join(text_chunks)
     else:
         text = str(data)
 
-    # Clean the text: lowercase and remove punctuation
+    # Clean text
     text = text.lower()
     text = text.translate(str.maketrans("", "", string.punctuation))
 
-    # Split into words
     words = text.split()
-
-    # Count words
     wordcount = Counter(words)
     numwords = len(words)
 
