@@ -1,5 +1,9 @@
 """
 Visualization Module for NLP Tasks
+DS 3500: Advance Programming with Data
+Members: Amir Sesay, Cassandra Cinzori, Ian Solberg, Iyman Mahmoud
+
+Visualization methods for comparative text analysis
 """
 
 import numpy as np
@@ -7,21 +11,39 @@ import matplotlib.pyplot as plt
 
 
 class NatLanGraphs:
+    """
+    Visualization class for natural language processing results
+    Provides multiple visualization types for comparative text analysis
+    """
 
     def __init__(self):
+        """
+        Initizalize the visualization class
+        """
         pass
 
-    def text_to_word_sankey(self, parser, word_list=None, k=5):
+    def text_to_word_sankey(self, parser, word_list=None, k=5, title="Text to Word Flow Analysis"):
         """
         (Specific) Text-to-Word Sankey diagram.
         Calls the parser's wordcount_sankey method
-        """
-        parser.wordcount_sankey(word_list=word_list, k=k)
 
-    def word_frequency_bars(self, parser, top_n=10):
+        Args:
+            parser: Instance for Parsnip framework with loaded documents
+            word_list: Optional list of specific words to visualize
+            k: Number of top words to show if word_list is None
+            title: Custom title for diagram
         """
-        (Flexible) subplots showing top words for each doc
-        One bar chart per doc
+        parser.wordcount_sankey(word_list=word_list, k=k, title=None)
+
+    def word_frequency_bars(self, parser, top_n=10, title=None):
+        """
+        (Flexible) subplots showing top words for each document
+        One bar chart per document arranged in a grid
+
+        Args:
+            parser: Instance for Parsnip framework with loaded documents
+            top_n: Number of top words to showp per document
+            title: Custom title for the overall figure (optional)
         """
         wordcounts = parser.data["wordcount"]
         num_docs = len(wordcounts)
@@ -60,9 +82,16 @@ class NatLanGraphs:
         plt.show()
         plt.show()
 
-    def compare_word_counts(self, parser, words=None, top_k=10):
+    def compare_word_counts(self, parser, words=None, top_k=10, title="Word Frequency Comparison"):
         """
         (Flexible) overlay comparison of word frequencies across all texts
+        Creates a grouped bar chart comparing words usage across documents
+
+        Args:
+            parser: Instance for Parsnip framework with loaded documents
+            words: Optional list of specific words to compare
+            top_k: Number of top words to compare is words is None
+            title: Custom title for the chart
         """
         wordcounts = parser.data["wordcount"]
 
@@ -89,9 +118,7 @@ class NatLanGraphs:
 
         ax.set_xlabel("Words")
         ax.set_ylabel("Frequency")
-        ax.set_title(
-            "Evolution of Climate Terminology: Word Frequency Comparison Across Decades"
-        )
+        ax.set_title(title)
         ax.set_xticks(x)
         ax.set_xticklabels(words, rotation=45, ha="right")
         ax.legend(title="Report", bbox_to_anchor=(1.05, 1), loc="upper left")
