@@ -23,51 +23,54 @@ def main():
     # Load text files
     print("\nLoading documents...")
 
+
     parser.load_text(
-        "data/charney_report.pdf",
-        label="1979: Charney Report",
+        "data/2000_DotCom_Era.pdf",
+        label="2000: Dot-Com Era",
         parser=pdf_parser,
     )
 
     parser.load_text(
-        "data/NASA_Hansen_Testimony.pdf",
-        label="1988: NASA Hansen Testimony ",
+        "data/2003_Amazon_Recovery.pdf",
+        label="2003: Amazon Recovery",
+        parser=pdf_parser,
+    )
+
+
+    parser.load_text(
+        "data/2006_Amazon_AWSLaunch.pdf",
+        label="2006: Amazon AWS Launch",
         parser=pdf_parser,
     )
 
     parser.load_text(
-        "data/First_IPCC_Report.pdf",
-        label="1990: First IPCC Report",
+        "data/2010_Amazon_DigitalProducts.pdf",
+        label="2010: Amazon Digital Products",
+        parser=pdf_parser,
+    )
+
+
+    parser.load_text(
+        "data/2014_Amazon_VoiceAI.pdf",
+        label="2014: Amazon Voice AI",
         parser=pdf_parser,
     )
 
     parser.load_text(
-        "data/Kyoto_Protocol_Text.pdf",
-        label="1997: Kyoto Protocol Text",
+        "data/2018_Amazon_MarketLeader.pdf",
+        label="2018: Amazon Market Leader",
         parser=pdf_parser,
     )
 
     parser.load_text(
-        "data/Stern_Review.pdf",
-        label="2006: Stern Review",
+        "data/2021_Amazon_PandemicPeak.pdf",
+        label="2021: Amazon Pandemic Peak",
         parser=pdf_parser,
     )
 
     parser.load_text(
-        "data/Paris_agreement.pdf",
-        label="2015: Paris Agreement",
-        parser=pdf_parser,
-    )
-
-    parser.load_text(
-        "data/IPCC_Special_Report.pdf",
-        label="2018: IPCC Special Report",
-        parser=pdf_parser,
-    )
-
-    parser.load_text(
-        "data/2023_IPCC_AR6_Report.pdf",
-        label="2023: IPCC AR6 Synthesis Report",
+        "data/2024_Amazon_AI_Integration.pdf",
+        label="2024: Amazon AI Integration",
         parser=pdf_parser,
     )
 
