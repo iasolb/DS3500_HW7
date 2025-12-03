@@ -9,6 +9,7 @@ Domain-specific parsers for different file types
 from collections import Counter
 import string
 
+
 def pdf_parser(filename):
     """
     Custom parser for PDF files.
@@ -34,7 +35,7 @@ def pdf_parser(filename):
 
     # Clean the text: lowercase and remove punctuation
     text = text.lower()
-    text = text.translate(str.maketrans("", "", string.punctuation))
+    text = "".join(char for char in text if char.isalpha() or char.isspace())
 
     # Split into words
     words = text.split()
@@ -50,6 +51,7 @@ def pdf_parser(filename):
 
     print(f"Parsed {filename}: {numwords} words")
     return results
+
 
 def json_parser(filename):
     """
@@ -93,7 +95,8 @@ def json_parser(filename):
     print(f"Parsed {filename}: {numwords} words")
     return results
 
-def csv_parser(filename, text_column='text'):
+
+def csv_parser(filename, text_column="text"):
     """
     Custom parser for CSV files
     Extracts and analyzes text from a specified column
@@ -115,13 +118,13 @@ def csv_parser(filename, text_column='text'):
             # If specified column does not exist, try to find any text-like column
             elif not text_data:
                 # Try column names
-                for col_name in ['text', 'content', 'body', 'message', 'description']:
+                for col_name in ["text", "content", "body", "message", "description"]:
                     if col_name in row:
                         text_data.append(row[col_name])
                         break
 
     # Combine all text
-    text = ' '.join(text_data)
+    text = " ".join(text_data)
 
     # Clean the text: lowercase and remove punctuation
     text = text.lower()
@@ -141,11 +144,3 @@ def csv_parser(filename, text_column='text'):
 
     print(f"Parsed {filename}: {numwords} words")
     return results
-
-
-
-
-
-
-
-
