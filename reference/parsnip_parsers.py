@@ -8,6 +8,7 @@ Domain-specific parsers for different file types
 
 from collections import Counter
 import string
+import json
 
 
 def pdf_parser(filename):
@@ -144,3 +145,18 @@ def csv_parser(filename, text_column="text"):
 
     print(f"Parsed {filename}: {numwords} words")
     return results
+
+
+def json_parser(filename):
+    try:
+        f = open(filename)
+        raw = json.load(f)
+        text = raw["text"]
+        words = text.split(" ")
+        wc = Counter(words)
+        num = len(words)
+        f.close()
+        return {"wordcount": wc, "numwords": num}
+    except Exception as e:
+        print(e)
+        return None
