@@ -2,6 +2,7 @@
 Application: Amazon Business Evolution Analysis (2000-2025)
 DS 3500: Advance Programming with Data
 Members: Amir Sesay, Cassandra Cinzori, Ian Solberg, Iyman Mahmoud
+Group Name: The Parseltongues (Harry Potter reference :) )
 
 This application demonstrates the evolution of the language used in Q4 earnings reports/calls issued by
 Amazon between 2000 and 2025.

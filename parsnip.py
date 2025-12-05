@@ -2,6 +2,7 @@
 NPL Framework - Core Module
 DS 3500: Advance Programming with Data
 Members: Amir Sesay, Cassandra Cinzori, Ian Solberg, Iyman Mahmoud
+Group Name: The Parseltongues (Harry Potter reference :) )
 
 Extensible framework for natural language processing and text analysis.
 Supports custom parsers and multiple visualization types.
