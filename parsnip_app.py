@@ -92,7 +92,7 @@ def main():
 
     print("\nCreating word trend analysis...")
     parsnip.word_trend_over_time(
-        word_list=["customers", "products", "services", "cloud", "digital"],
+        word_list=["customers", "products", "digital", "marketplace", "artificial", "infrastructure"],
         title="Technology Term Evolution: Amazon Annual Reports (2000-2025)"
     )
 
