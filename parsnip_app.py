@@ -1,10 +1,10 @@
 """
-Application: Climate Change Report Analysis
+Application: Amazon Business Evolution Analysis (2000-2025)
 DS 3500: Advance Programming with Data
 Members: Amir Sesay, Cassandra Cinzori, Ian Solberg, Iyman Mahmoud
 
 This application demonstrates the evolution of the language used in Q4 earnings reports/calls issued by
-Amazon between 2000 and 2024.
+Amazon between 2000 and 2025.
 """
 
 from parsnip import Parsnip
@@ -63,8 +63,8 @@ def main():
     )
 
     parsnip.load_text(
-        "data/2024_Amazon_AI_Integration.pdf",
-        label="2024: Amazon AI Integration",
+        "data/2025_Amazon_AI _Integration.pdf",
+        label="2025: Amazon AI Integration",
         parser=parsnip.pdf_parser,
     )
 
@@ -73,20 +73,26 @@ def main():
     print("=" * 60)
 
     print("\nCreating Sankey diagram...")
-    parsnip.text_to_word_sankey(
-        k=5, title="Climate Change Reports: Word Frequency Analysis"
+    parsnip.wordcount_sankey(
+        k=5, title="Amazon Annual Reports: Word Frequency Flow (2000-2024)"
     )
 
     print("\nCreating words frequency subplots...")
     parsnip.word_frequency_bars(
         top_n=10,
-        title="Top 10 Most Frequent Words Across Climate Change Reports (1970s-2023)",
+        title="Top 10 Most Frequent Words Across Amazon Annual Reports (2000-2024)",
     )
 
     print("\nCreating comparison chart...")
     parsnip.compare_word_counts(
         top_k=10,
-        title="Evolution of Climate Terminology: Word Frequency Comparison Across Decades",
+        title="Evolution of Business Language: Amazon Annual Reports (2000-2024)",
+    )
+
+    print("\nCreating word trend analysis...")
+    parsnip.word_trend_over_time(
+        word_list=["customers", "products", "services", "cloud", "digital"],
+        title="Technology Term Evolution: Amazon Annual Reports (2000-2025)"
     )
 
     print("=" * 60)

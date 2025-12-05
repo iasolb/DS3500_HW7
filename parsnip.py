@@ -70,7 +70,7 @@ class Parsnip:
                     filtered[word] = count
             self.data["wordcount"][label] = filtered
 
-    # ==== Native Parsers Parsers
+    # ==== Native Parsers
 
     @staticmethod
     def default_parser(filename):
@@ -189,24 +189,60 @@ class Parsnip:
         print(f"Parsed {filename}: {numwords} words")
         return results
 
-    def json_parser(self, filename):
+
+    def json_parser(self, filename, text_key="text"):
+        """
+        Custom parser for JSON files
+        Expects JSON with a text field
+
+        Args:
+            filename (str): Path to JSON file
+            text_key (str): Key in JSON containing text (default: "text")
+
+        Returns:
+            Dictionary containing wordcount and numwords
+        """
         try:
-            f = open(filename)
-            raw = json.load(f)
-            text = raw["text"]
-            words = text.split(" ")
-            wc = Counter(words)
-            num = len(words)
-            f.close()
-            return {"wordcount": wc, "numwords": num}
+            with open(filename, 'r', encoding='utf-8') as f:
+                raw = json.load(f)
+                text = raw[text_key]
+
+                # Clean the text: lowercase and remove punctuation
+                text = text.lower()
+                text = "".join(char for char in text if char.isalpha() or char.isspace())
+                words = text.split()
+
+                wordcount = Counter(words)
+                numwords = len(words)
+
+                results = {
+                    "wordcount": wordcount,
+                    "numwords": numwords,
+                }
+
+                print(f"Parsed {filename}: {numwords} words")
+                return results
+        except KeyError:
+            print(f"Error: JSON file {filename} does not contain '{text_key}' field")
+            return {"wordcount": Counter(), "numwords": 0}
+        except json.JSONDecodeError:
+            print(f"Error: {filename} is not valid JSON")
+            return {"wordcount": Counter(), "numwords": 0}
         except Exception as e:
-            print(e)
-            return None
+            print(f"Error parsing {filename}: {e}")
+            return {"wordcount": Counter(), "numwords": 0}
 
     # ==== Visualization
 
-    def word_frequency_bars(self, words=None, top_n=10, title=None):
-        """ """
+    def word_frequency_bars(self, word_list=None, top_n=10, title=None):
+        """
+        Create a grid of horizontal bar charts showing top N most frequent words for each document.
+
+        Args:
+            word_list: Optional list of specific words to display. If None, shows top_n words
+            top_n: Number of top words to display for each document (default: 10)
+            title: Custom title for the overall figure (default: generic title based on top_n)
+        """
         wordcounts = self.data["wordcount"]
         num_docs = len(wordcounts)
         cols = int(np.ceil(np.sqrt(num_docs)))
@@ -217,23 +253,32 @@ class Parsnip:
         else:
             axes = axes.flatten()
         for index, (label, counter) in enumerate(wordcounts.items()):
-            top_words = counter.most_common(top_n)
-            words = [word for word, count in top_words]
-            count = [count for word, count in top_words]
+            # If word_list is provided, use it; otherwise get top_n words
+            if word_list is not None:
+
+                # Filter to only words that exist in this document's counter
+                words = [word for word in word_list if word in counter]
+                count = [counter[word] for word in words]
+            else:
+                top_words = counter.most_common(top_n)
+                words = [word for word, count in top_words]
+                count = [count for word, count in top_words]
+
             axes[index].barh(words, count)
             axes[index].set_title(label)
             axes[index].set_xlabel("Frequency")
             axes[index].invert_yaxis()
         for index in range(num_docs, len(axes)):
             axes[index].set_visible(False)
-        plt.suptitle(
-            f"Top {top_n} Most Frequent Words Across Climate Change Reports (1970s-2023)"
-        )
+
+        # Use custom title if provided, otherwise use default
+        if title is None:
+            title = f"Top {top_n} Most Frequent Words Across Documents"
+        plt.suptitle(title)
         plt.tight_layout()
         plt.show()
-        plt.show()
 
-    def text_to_word_sankey(self, words=None, k=5, title="Text to Word Flow Analysis"):
+    def wordcount_sankey(self, word_list=None, k=5, title="Text to Word Flow Analysis"):
         """
         Create a Sankey diagram mapping texts to words
 
@@ -244,16 +289,16 @@ class Parsnip:
         """
 
         # Get words to show
-        if words is None:
+        if word_list is None:
             all_words = set()
             for label, counter in self.data["wordcount"].items():
                 top_k = [word for word, count in counter.most_common(k)]
                 all_words.update(top_k)
-            words = list(all_words)
+            word_list = list(all_words)
 
         # Build Sankey
         labels = list(self.data["wordcount"].keys())
-        nodes = labels + words
+        nodes = labels + word_list
 
         # Create links
         sources = []
@@ -262,11 +307,11 @@ class Parsnip:
 
         for i, label in enumerate(labels):
             counter = self.data["wordcount"][label]
-            for word in words:
+            for word in word_list:
                 count = counter.get(word, 0)
                 if count > 0:
                     sources.append(i)
-                    targets.append(len(labels) + words.index(word))
+                    targets.append(len(labels) + word_list.index(word))
                     values.append(count)
 
         # Create fig
@@ -280,40 +325,78 @@ class Parsnip:
         fig.update_layout(title=title)
         fig.show()
 
-    def compare_word_counts(
-        self, words=None, top_k=10, title="Word Frequency Comparison"
-    ):
+    def compare_word_counts(self, word_list=None, top_k=10, title="Word Frequency Comparison"):
         """
-        (Flexible) overlay comparison of word frequencies across all texts
-        Creates a grouped bar chart comparing words usage across documents
+        Overlay comparison of word frequencies across all texts.
+        Creates a grouped bar chart comparing word usage across documents.
 
         Args:
-            parser: Instance for Parsnip framework with loaded documents
-            words: Optional list of specific words to compare
-            top_k: Number of top words to compare is words is None
-            title: Custom title for the chart
+            word_list: Optional list of specific words to compare
+            top_k: Number of top words to compare if word_list is None
+            title: Custom title for the chart (default: "Word Frequency Comparison")
         """
         wordcounts = self.data["wordcount"]
 
-        if words is None:
-            all_words = set()
+        if word_list is None:
+            # Combine all counters to get overall top words
+            combined_counter = Counter()
             for label, counter in wordcounts.items():
-                top = [word for word, count in counter.most_common(top_k)]
-                all_words.update(top)
-            words = list(all_words)[:top_k]
+                combined_counter.update(counter)
+
+            # Get the top_k most common words from the combined corpus
+            word_list = [word for word, count in combined_counter.most_common(top_k)]
+
         labels = list(wordcounts.keys())
-        x = np.arange(len(words))
+        x = np.arange(len(word_list))
         width = 0.8 / len(labels)
         fig, ax = plt.subplots(figsize=(12, 6))
+
         for index, label in enumerate(labels):
-            counts = [wordcounts[label].get(word, 0) for word in words]
+            counts = [wordcounts[label].get(word, 0) for word in word_list]
             offset = (index - len(labels) / 2) * width + width / 2
             ax.bar(x + offset, counts, width, label=label)
+
         ax.set_xlabel("Words")
         ax.set_ylabel("Frequency")
         ax.set_title(title)
         ax.set_xticks(x)
-        ax.set_xticklabels(words, rotation=45, ha="right")
-        ax.legend(title="Report", bbox_to_anchor=(1.05, 1), loc="upper left")
+        ax.set_xticklabels(word_list, rotation=45, ha="right")
+        ax.legend(title="Documents", bbox_to_anchor=(1.05, 1), loc="upper left")
+        plt.tight_layout()
+        plt.show()
+
+    def word_trend_over_time(self, word_list=None, top_k=5, title="Word Frequency Trends Over Time"):
+        """
+        Track how specific words change in frequency across documents.
+        Best used with temporally ordered documents.
+
+        Args:
+            word_list: Optional list of specific words to track. If None, uses top_k most common words
+            top_k: Number of top words to track if word_list is None (default: 5)
+            title: Custom title for the chart
+        """
+        wordcounts = self.data["wordcount"]
+        labels = list(wordcounts.keys())
+
+        # If word_list not provided, get top words from combined corpus
+        if word_list is None:
+            combined_counter = Counter()
+            for counter in wordcounts.values():
+                combined_counter.update(counter)
+            word_list = [word for word, count in combined_counter.most_common(top_k)]
+
+        plt.figure(figsize=(12, 6))
+
+        for word in word_list:
+            frequencies = [wordcounts[label].get(word, 0) for label in labels]
+            plt.plot(range(len(labels)), frequencies, marker='o', linewidth=2,
+                     markersize=6, label=word)
+
+        plt.xlabel("Timeline", fontsize=12)
+        plt.ylabel("Frequency", fontsize=12)
+        plt.title(title, fontsize=14)
+        plt.xticks(range(len(labels)), labels, rotation=45, ha="right")
+        plt.legend(loc="best", fontsize=10)
+        plt.grid(True, alpha=0.3)
         plt.tight_layout()
         plt.show()
